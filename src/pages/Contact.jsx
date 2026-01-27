@@ -9,12 +9,12 @@ const Contact = () => {
   const [error, setError] = useState(false);
 
   const FETCH_URL = import.meta.env.VITE_API_URL;
-  console.log(FETCH_URL);
+
   async function submitHandle() {
     try{
       setLodder(true);
 
-      const response = await fetch(FETCH_URL, {
+      const response = await fetch(`${FETCH_URL}/contact`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, message }),
