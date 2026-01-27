@@ -5,14 +5,16 @@ const Contact = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [lodder, setLodder] = useState(false);
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(false)
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(false);
 
+  const FETCH_URL = import.meta.env.VITE_API_URL;
+  console.log(FETCH_URL);
   async function submitHandle() {
     try{
       setLodder(true);
 
-      const response = await fetch("http://localhost:5000/contact", {
+      const response = await fetch(FETCH_URL, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email, message }),
