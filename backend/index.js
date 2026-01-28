@@ -39,6 +39,10 @@ app.post("/contact", async (req, res) => {
         user: process.env.BREVO_SMTP_USER,
         pass: process.env.BREVO_SMTP_KEY,
       },
+      pool: true,
+      connectionTimeout: 20000, // 20 sec
+      greetingTimeout: 20000,
+      socketTimeout: 20000,
     });
 
     // Mail to YOU
