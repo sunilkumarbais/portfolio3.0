@@ -1,5 +1,6 @@
 import express from "express";
 import nodemailer from "nodemailer";
+import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -16,72 +17,58 @@ app.post("/contact", async (req, res) => {
     const { email, message } = req.body;
 
     if (!email || !message) {
-      return res.status(400).json({
-        success: false,
-        message: "❌ Email and message are required",
-      });
+      return res.status(400).json({ success: false, message: "All fields required" });
     }
-
-    const emailValidator = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-    if (!emailValidator.test(email)) {
-      return res.status(401).json({
-        success: false,
-        message: "❌ Invalid email format",
-      });
-    }
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_KEY,
-      },
-      pool: true,
-      connectionTimeout: 20000, // 20 sec
-      greetingTimeout: 20000,
-      socketTimeout: 20000,
-    });
 
     // Mail to YOU
-    await transporter.sendMail({
-      from: "Sunil kumar <sunilkumarbais46@gmail.com>",
-      to: "sunilkumarbais46@gmail.com",
-      subject: "New Portfolio Contact Message",
-      text: `From: ${email}\n\nMessage:\n${message}`,
-    });
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "Sunil Kumar",
+          email: "sunilkumarbais46@gmail.com",
+        },
+        to: [{ email: "sunilkumarbais46@gmail.com" }],
+        replyTo: { email },
+        subject: "Portfolio Contact Message",
+        textContent: `From: ${email}\n\nMessage:\n${message}`,
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     // Auto reply
-    await transporter.sendMail({
-      from: "Sunil kumar <sunilkumarbais46@gmail.com>",
-      to: email,
-      subject: "Thanks for contacting me 👋",
-      text: `Hi,
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "Sunil Kumar",
+          email: "sunilkumarbais46@gmail.com",
+        },
+        to: [{ email }],
+        subject: "Thanks for contacting me 👋",
+        textContent: "Thanks for contacting me. I will reply soon.",
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-        Thank you for reaching out through my portfolio website.
-        I’ve received your message and will get back to you soon.
-
-        Best regards,
-        Sunil Kumar
-        MERN Stack Developer`,
-    });
-
-
-    res.status(200).json({
-      success: true,
-      message: "✅ Message sent successfully",
-    });
+    res.json({ success: true, message: "Email sent successfully" });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      success: false,
-      message: "❌ Error sending mail",
-    });
+    console.error(err.response?.data || err.message);
+    res.status(500).json({ success: false, message: "Email failed" });
   }
 });
+
 
 
 
