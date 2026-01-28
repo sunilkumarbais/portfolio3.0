@@ -32,45 +32,38 @@ app.post("/contact", async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host: "smtp-relay.brevo.com",
       port: 587,
-      secure: false, // TLS
+      secure: false,
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_KEY,
       },
-      tls: {
-        rejectUnauthorized: false,
-      },
-      connectionTimeout: 10000, // 10 sec
     });
-
 
     // Mail to YOU
     await transporter.sendMail({
-      from: `"Portfolio Contact" <${process.env.EMAIL}>`,
-      to: process.env.EMAIL,
-      replyTo: email,
-      subject: "Portfolio Contact Message",
+      from: "Sunil kumar <sunilkumarbais46@gmail.com>",
+      to: "sunilkumarbais46@gmail.com",
+      subject: "New Portfolio Contact Message",
       text: `From: ${email}\n\nMessage:\n${message}`,
     });
 
-    // Auto-reply to USER
+    // Auto reply
     await transporter.sendMail({
-      from: `Sunil Kumar <${process.env.EMAIL}>`,
+      from: "Sunil kumar <sunilkumarbais46@gmail.com>",
       to: email,
       subject: "Thanks for contacting me 👋",
-      text: `
-      Hi there,
+      text: `Hi,
 
-      Thank you for reaching out through my portfolio website.
-      I’ve received your message and will get back to you soon.
+        Thank you for reaching out through my portfolio website.
+        I’ve received your message and will get back to you soon.
 
-      Best regards,
-      Sunil Kumar
-      MERN Stack Developer
-      `,
+        Best regards,
+        Sunil Kumar
+        MERN Stack Developer`,
     });
+
 
     res.status(200).json({
       success: true,
