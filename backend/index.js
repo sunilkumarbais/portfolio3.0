@@ -1,5 +1,4 @@
 import express from "express";
-import nodemailer from "nodemailer";
 import axios from "axios";
 import cors from "cors";
 import dotenv from "dotenv";
